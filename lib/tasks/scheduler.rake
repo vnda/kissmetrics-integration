@@ -1,4 +1,4 @@
 desc 'This task is called by the Heroku scheduler add-on'
-task :hello_world => :environment do
-  puts 'Hello world'
+task :process_orders => :environment do
+  ProcessOrders.new.run
 end
