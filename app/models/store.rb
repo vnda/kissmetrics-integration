@@ -44,7 +44,22 @@ class Store < ActiveRecord::Base
       'Items' => km_items(order['items']),
     }.to_query
     url = "http://trk.kissmetrics.com/e?#{params}"
-    RestClient.get(url)
+
+    attempt = 1
+    begin
+      if attempt > 1
+        seconds = {2=>3, 3=>15}[attempt]
+        puts "Waiting #{seconds} seconds..."
+        sleep(seconds)
+      end
+      RestClient.get(url)
+    rescue => e
+      puts e
+      attempt += 1
+      retry if attempt <= 3
+      raise e
+    end
+
     puts "Order #{order['id']} #{status.param} at #{order[status.at]}."
   end
 
