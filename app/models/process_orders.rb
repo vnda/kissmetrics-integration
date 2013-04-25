@@ -1,7 +1,7 @@
 class ProcessOrders
 
   def run
-    Store.all.each do |store|
+    Store.where(active: true).each do |store|
       puts store.domain
       OrderStatus.all.each do |order_status|
         begin

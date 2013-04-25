@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130422133314) do
+ActiveRecord::Schema.define(version: 20130425183406) do
 
   create_table "stores", force: true do |t|
     t.string  "domain"
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 20130422133314) do
     t.integer "last_order_received_id"
     t.integer "last_order_confirmed_id"
     t.integer "last_order_canceled_id"
+    t.boolean "active",                  default: true, null: false
   end
 
   add_index "stores", ["domain"], name: "index_stores_on_domain", unique: true
