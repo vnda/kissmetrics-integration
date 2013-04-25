@@ -40,7 +40,7 @@ class Store < ActiveRecord::Base
       'Shipping Price' => order['shipping_price'],
       'Subtotal' => order['subtotal'],
       'Discount Price' => order['discount_price'],
-      'Total' => order['total'],
+      status.km_total_property => status.total_value(order['total']),
       'Items' => km_items(order['items']),
     }.to_query
     url = "http://trk.kissmetrics.com/e?#{params}"
@@ -54,7 +54,7 @@ class Store < ActiveRecord::Base
       end
       RestClient.get(url)
     rescue => e
-      puts e
+      puts "#{e} #{url}"
       attempt += 1
       retry if attempt <= 3
       raise e
