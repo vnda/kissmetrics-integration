@@ -1,22 +1,22 @@
 require 'test_helper'
 
-class StoreTest < ActiveSupport::TestCase
+class OrderTest < ActiveSupport::TestCase
 
-  test "time" do
+  test "status_timestamp" do
     store = Store.new
-    order = {
+    order_hash = {
       'received_at' => '2013-02-25T17:15:22-03:00',
       'confirmed_at' => nil,
       'canceled_at' => '2013-02-25T17:28:56-03:00',
     }
-    assert_equal(1361823322, store.order_timestamp(order, OrderStatus.received))
-    assert_nil(store.order_timestamp(order, OrderStatus.confirmed))
-    assert_equal(1361824136, store.order_timestamp(order, OrderStatus.canceled))
+    assert_equal(1361823322, Order.new(store, OrderStatus.received, order_hash).status_timestamp)
+    assert_nil(Order.new(store, OrderStatus.confirmed, order_hash).status_timestamp)
+    assert_equal(1361824136, Order.new(store, OrderStatus.canceled, order_hash).status_timestamp)
   end
 
-  test "km_event" do
+  test "km_record_event_url" do
     store = stores(:bodystore)
-    order = {
+    order_hash = {
       'id' => 11263,
       'code' => 'F6D84B780B',
       'first_name' => 'Rafael',
@@ -44,8 +44,14 @@ class StoreTest < ActiveSupport::TestCase
       'confirmed_at' => nil,
       'canceled_at' => '2013-02-25T17:28:56-03:00',
     }
-    store.km_event(order, OrderStatus.received)
-    store.km_event(order, OrderStatus.canceled)
+    url = Order.new(store, OrderStatus.received, order_hash).km_record_event_url
+    assert_match(/&order_total=58.9/, url)
+    assert_match(/&Items%20Quantity=1/, url)
+    url = Order.new(store, OrderStatus.canceled, order_hash).km_record_event_url
+    assert_match(/&order_total=-58.9/, url)
+    url = Order.new(store, OrderStatus.confirmed, order_hash).km_record_event_url
+    assert_match(/&billing_amout=58.9/, url)
   end
+
 
 end

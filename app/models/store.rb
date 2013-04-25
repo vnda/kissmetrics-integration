@@ -15,67 +15,9 @@ class Store < ActiveRecord::Base
 
   def get_orders(status, since_order_id)
     url = orders_api_url(status, since_order_id)
-    response = RestClient.get(url)
+    response = RestClient.get_with_retry(url)
     raise "Erro na chamada de #{url}.\nResponse code #{response.code}" unless response.code == 200
-    JSON.parse(response)
-  end
-
-  def order_timestamp(order, status)
-    DateTime.strptime(order[status.at], '%Y-%m-%dT%H:%M:%S%:z').to_i if order[status.at]
-  end
-
-  def km_event(order, status)
-    params = {
-      '_k' => km_api_key,
-      '_p' => order['email'],
-      '_n' => status.km_event,
-      '_t' => order_timestamp(order, status),
-      '_d' => '1',
-      'OrderID' => order['id'],
-      'Order Code' => order['code'],
-      'Items Quantity' => order['items'].size,
-      'Name' => "#{order['first_name']} #{order['last_name']}",
-      'ClientId' => order['client_id'],
-      'Payment Method' => order['payment_method'],
-      'Shipping Price' => order['shipping_price'],
-      'Subtotal' => order['subtotal'],
-      'Discount Price' => order['discount_price'],
-      status.km_total_property => status.total_value(order['total']),
-      'Items' => km_items(order['items']),
-    }.to_query
-    url = "http://trk.kissmetrics.com/e?#{params}"
-
-    attempt = 1
-    begin
-      if attempt > 1
-        seconds = {2=>3, 3=>15}[attempt]
-        puts "Waiting #{seconds} seconds..."
-        sleep(seconds)
-      end
-      RestClient.get(url)
-    rescue => e
-      puts "#{e} #{url}"
-      attempt += 1
-      retry if attempt <= 3
-      raise e
-    end
-
-    puts "Order #{order['id']} #{status.param} at #{order[status.at]}."
-  end
-
-  def km_items(items)
-    items_hash = {}
-    items.each_index do |i|
-      item = items[i]
-      items_hash[i+1] = {
-        'SKU' => item['sku'],
-        'Reference' => item['reference'],
-        'Quantity' => item['quantity'],
-        'Price' => item['subtotal'],
-        'Total Price' => item['total']
-      }
-    end
-    items_hash
+    JSON.parse(response).map { |order_hash| Order.new(self, status, order_hash) }
   end
 
 end
