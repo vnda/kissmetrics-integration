@@ -63,7 +63,7 @@ class Order < Struct.new(
   # http://support.kissmetrics.com/apis/specifications.html#setting-properties
   def km_set_item_properites_url(index, item)
     params = km_api_main_parameters.merge({
-      'Item' => {
+      "#{status.km_item_prefix} Item" => {
         index => {
           'SKU' => item['sku'],
           'Reference' => item['reference'],
