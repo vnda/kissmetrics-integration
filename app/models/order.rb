@@ -55,13 +55,9 @@ class Order < Struct.new(
       'Shipping Price' => shipping_price,
       'Subtotal' => subtotal,
       'Discount Price' => discount_price,
-      status.km_total_property => km_total_value,
+      status.km_total_property => total,
     })
     "http://trk.kissmetrics.com/e?#{params.to_query}"
-  end
-
-  def km_total_value
-    status.param == "canceled" ? -total : total
   end
 
   # http://support.kissmetrics.com/apis/specifications.html#setting-properties

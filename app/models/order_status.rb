@@ -1,8 +1,8 @@
 class OrderStatus < Struct.new(:param, :km_event, :at, :last_order_id_column, :km_total_property)
 
-  STATUSES            = %w(   received    canceled     confirmed)
-  KM_EVENTS           = %w(  purchased    canceled       billing)
-  KM_TOTAL_PROPERTIES = %w(order_total order_total billing_amout)
+  STATUSES            = %w(   received       canceled     confirmed)
+  KM_EVENTS           = %w(  purchased       canceled       billing)
+  KM_TOTAL_PROPERTIES = %w(order_total canceled_total billing_amout)
 
   # Create methods OrderStatus.received, OrderStatus.canceled, etc
   STATUSES.each do |status|

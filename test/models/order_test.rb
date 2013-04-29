@@ -48,7 +48,7 @@ class OrderTest < ActiveSupport::TestCase
     assert_match(/&order_total=58.9/, url)
     assert_match(/&Items%20Quantity=1/, url)
     url = Order.new(store, OrderStatus.canceled, order_hash).km_record_event_url
-    assert_match(/&order_total=-58.9/, url)
+    assert_match(/&canceled_total=58.9/, url)
     url = Order.new(store, OrderStatus.confirmed, order_hash).km_record_event_url
     assert_match(/&billing_amout=58.9/, url)
   end
