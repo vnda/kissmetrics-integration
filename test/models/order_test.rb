@@ -45,12 +45,13 @@ class OrderTest < ActiveSupport::TestCase
       'canceled_at' => '2013-02-25T17:28:56-03:00',
     }
     url = Order.new(store, OrderStatus.received, order_hash).km_record_event_url
-    assert_match(/&order_total=58.9/, url)
-    assert_match(/&Items%20Quantity=1/, url)
+    assert_match(/[&\?]order_total=58.9/, url)
+    assert_match(/[&\?]Items%20Quantity=1/, url)
+    assert_match(/[&\?]_p=3/, url)
     url = Order.new(store, OrderStatus.canceled, order_hash).km_record_event_url
-    assert_match(/&canceled_total=58.9/, url)
+    assert_match(/[&\?]canceled_total=58.9/, url)
     url = Order.new(store, OrderStatus.confirmed, order_hash).km_record_event_url
-    assert_match(/&billing_amout=58.9/, url)
+    assert_match(/[&\?]billing_amout=58.9/, url)
   end
 
   test "km_set_item_properites_url" do
@@ -85,13 +86,13 @@ class OrderTest < ActiveSupport::TestCase
     }
     order = Order.new(store, OrderStatus.received, order_hash)
     url = order.km_set_item_properites_url(1, order.items.first)
-    assert_match(/&Received%20Item%5B1%5D%5BSKU%5D=1816/, url)
+    assert_match(/[&\?]Received%20Item%5B1%5D%5BSKU%5D=1816/, url)
     order = Order.new(store, OrderStatus.canceled, order_hash)
     url = order.km_set_item_properites_url(1, order.items.first)
-    assert_match(/&Canceled%20Item%5B1%5D%5BSKU%5D=1816/, url)
+    assert_match(/[&\?]Canceled%20Item%5B1%5D%5BSKU%5D=1816/, url)
     order = Order.new(store, OrderStatus.confirmed, order_hash)
     url = order.km_set_item_properites_url(1, order.items.first)
-    assert_match(/&Confirmed%20Item%5B1%5D%5BSKU%5D=1816/, url)
+    assert_match(/[&\?]Confirmed%20Item%5B1%5D%5BSKU%5D=1816/, url)
   end
 
 end

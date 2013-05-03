@@ -41,7 +41,7 @@ class Order < Struct.new(
   def km_api_main_parameters
     {
       '_k' => store.km_api_key,
-      '_p' => email,
+      '_p' => client_id,
       '_t' => status_timestamp,
       '_d' => '1',
     }
