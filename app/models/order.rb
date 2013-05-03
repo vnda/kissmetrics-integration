@@ -29,8 +29,13 @@ class Order < Struct.new(
     end
   end
 
+  # caso seja confirmado ou cancelado e não tenha a respectiva data, usa data de recebimento
+  def status_date
+    send(status.at) || received_at
+  end
+
   def status_timestamp
-    DateTime.strptime(send(status.at), '%Y-%m-%dT%H:%M:%S%:z').to_i if send(status.at)
+    DateTime.strptime(status_date, '%Y-%m-%dT%H:%M:%S%:z').to_i if status_date
   end
 
   def km_api_main_parameters
@@ -78,7 +83,7 @@ class Order < Struct.new(
 
   def km_event
     RestClient.get_with_retry(km_record_event_url)
-    puts "Order #{id} #{status.param} at #{send(status.at)}."
+    puts "Order #{id} #{status.param} at #{status_date}."
     items.each_index do |i|
       RestClient.get_with_retry(km_set_item_properites_url(i+1, items[i]))
       puts "Item #{i+1} #{items[i]['sku']}"

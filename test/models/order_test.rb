@@ -10,7 +10,7 @@ class OrderTest < ActiveSupport::TestCase
       'canceled_at' => '2013-02-25T17:28:56-03:00',
     }
     assert_equal(1361823322, Order.new(store, OrderStatus.received, order_hash).status_timestamp)
-    assert_nil(Order.new(store, OrderStatus.confirmed, order_hash).status_timestamp)
+    assert_equal(1361823322, Order.new(store, OrderStatus.confirmed, order_hash).status_timestamp)
     assert_equal(1361824136, Order.new(store, OrderStatus.canceled, order_hash).status_timestamp)
   end
 

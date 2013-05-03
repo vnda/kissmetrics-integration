@@ -1,4 +1,4 @@
-class OrderStatus < Struct.new(:param, :km_event, :at, :last_order_id_column, :km_total_property, :km_item_prefix)
+class OrderStatus < Struct.new(:param, :km_event, :at, :last_order_date_column, :km_total_property, :km_item_prefix)
 
   STATUSES            = %w(   received       canceled     confirmed)
   KM_EVENTS           = %w(  purchased       canceled       billing)
@@ -17,7 +17,7 @@ class OrderStatus < Struct.new(:param, :km_event, :at, :last_order_id_column, :k
   end
 
   def self.by_param(param)
-    new(param, map_km_event[param], "#{param}_at", "last_order_#{param}_id", map_km_total_property[param], map_km_item_prefix[param])
+    new(param, map_km_event[param], "#{param}_at", "last_order_#{param}_date", map_km_total_property[param], map_km_item_prefix[param])
   end
 
   def self.map_km_event

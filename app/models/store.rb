@@ -4,12 +4,12 @@ class Store < ActiveRecord::Base
     "http://#{user}:#{pass}@#{domain}/api/orders?status=#{status.param}&since_id=#{since_id}"
   end
 
-  def last_order_id(status)
-    send(status.last_order_id_column)
+  def last_order_date(status)
+    send(status.last_order_date_column)
   end
 
-  def set_last_order_id(status, order_id)
-    send("#{status.last_order_id_column}=", order_id)
+  def set_last_order_date(status, order_date)
+    send("#{status.last_order_date_column}=", order_date)
     save!
   end
 

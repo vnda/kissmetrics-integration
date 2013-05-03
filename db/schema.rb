@@ -11,17 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130425185345) do
+ActiveRecord::Schema.define(version: 20130503202827) do
 
   create_table "stores", force: true do |t|
-    t.string  "domain"
-    t.string  "user"
-    t.string  "pass"
-    t.string  "km_api_key"
-    t.integer "last_order_received_id"
-    t.integer "last_order_confirmed_id"
-    t.integer "last_order_canceled_id"
-    t.boolean "active",                  default: true, null: false
+    t.string   "domain"
+    t.string   "user"
+    t.string   "pass"
+    t.string   "km_api_key"
+    t.boolean  "active",                    default: true, null: false
+    t.datetime "last_order_received_date"
+    t.datetime "last_order_confirmed_date"
+    t.datetime "last_order_canceled_date"
   end
 
 end
