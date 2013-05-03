@@ -56,6 +56,7 @@ class Order < Struct.new(
       'Items Quantity' => items.size,
       'Name' => "#{first_name} #{last_name}",
       'ClientId' => client_id,
+      'Email' => email,
       'Payment Method' => payment_method,
       'Shipping Price' => shipping_price,
       'Subtotal' => subtotal,
