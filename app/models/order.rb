@@ -38,13 +38,19 @@ class Order < Struct.new(
     DateTime.strptime(status_date, '%Y-%m-%dT%H:%M:%S%:z').to_i if status_date
   end
 
-  def km_api_main_parameters
+  def km_api_key_person_parameters
     {
       '_k' => store.km_api_key,
       '_p' => client_id,
+    }    
+  end
+  
+  
+  def km_api_main_parameters
+    km_api_key_person_parameters.merge({
       '_t' => status_timestamp,
       '_d' => '1',
-    }
+    })
   end
 
   # http://support.kissmetrics.com/apis/specifications.html#recording-an-event
@@ -65,6 +71,11 @@ class Order < Struct.new(
     })
     "http://trk.kissmetrics.com/e?#{params.to_query}"
   end
+  
+  def km_alias_user_url
+    params = km_api_key_person_parameters.merge({'_n' => email})
+    "http://trk.kissmetrics.com/a?#{params.to_query}"    
+  end
 
   # http://support.kissmetrics.com/apis/specifications.html#setting-properties
   def km_set_item_properites_url(index, item)
@@ -83,6 +94,7 @@ class Order < Struct.new(
   end
 
   def km_event
+    RestClient.get_with_retry(km_alias_user_url)
     RestClient.get_with_retry(km_record_event_url)
     puts "Order #{id} #{status.param} at #{status_date}."
     items.each_index do |i|
