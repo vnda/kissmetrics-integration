@@ -1,7 +1,7 @@
 class ProcessOrders
 
   def run
-    Store.where(active: true).each do |store|
+    stores.each do |store|
       puts store.domain
       OrderStatus.all.each do |order_status|
         begin
@@ -45,6 +45,10 @@ class ProcessOrders
   
   def max_date_to_process
     @max_date_to_process ||= 30.minutes.ago
+  end
+  
+  def stores
+    Store.where(active: true)
   end
 
 end
