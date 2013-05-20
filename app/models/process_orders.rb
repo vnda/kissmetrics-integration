@@ -11,9 +11,11 @@ class ProcessOrders
           begin
             orders = store.get_orders(order_status, since_order_id)
             orders.each do |order|
-              order.km_event if send_km_event?(order, last_order_date)
+              if send_km_event?(order, last_order_date)
+                order.km_event
+                new_last_order_date = order.status_date if new_last_order_date.nil? || new_last_order_date < order.status_date
+              end
               since_order_id = order.id if since_order_id.nil? || order.id < since_order_id
-              new_last_order_date = order.status_date if new_last_order_date.nil? || new_last_order_date < order.status_date
             end
           end while orders.any?
           store.set_last_order_date(order_status, new_last_order_date)
@@ -35,10 +37,14 @@ class ProcessOrders
   # pedido como sendo o mais recente processado e o pedido anterior não será processado na
   # próxima execução do script.
   def send_km_event?(order, last_order_date)
-    order.status_date < 30.minutes.ago && (
+    order.status_date < max_date_to_process && (
       last_order_date.nil? ||
       order.status_date > last_order_date
     )
+  end
+  
+  def max_date_to_process
+    @max_date_to_process ||= 30.minutes.ago
   end
 
 end
