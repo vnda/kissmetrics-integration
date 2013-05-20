@@ -13,6 +13,9 @@ class OrderMock < Struct.new(:id, :status_date)
   def sent?
     @sent
   end
+  def reset!
+    @sent = false
+  end
 end
 
 class StoreMock
@@ -29,6 +32,12 @@ class StoreMock
   
   def orders
     @orders
+  end
+  
+  def reset_orders
+    orders.each do |order|
+      order.reset!
+    end
   end
   
   def get_orders(order_status, since_order_id)
@@ -71,7 +80,8 @@ class ProcessOrdersTest < ActiveSupport::TestCase
     process_orders = ProcessOrders.new
     store = StoreMock.new(@orders)
     process_orders.define_singleton_method(:stores) { [store] }
-    process_orders.define_singleton_method(:max_date_to_process) { DateTime.new(2013, 5, 20, 20, 30, 0) }
+    
+    process_orders.define_singleton_method(:max_date_to_process) { DateTime.new(2013, 5, 20, 20, 30, 00) }
     process_orders.run
     orders_hash = store.orders.index_by(&:id)
     assert(orders_hash[101].sent?)
@@ -80,6 +90,36 @@ class ProcessOrdersTest < ActiveSupport::TestCase
     assert(orders_hash[104].sent?)
     assert_not(orders_hash[105].sent?)
     assert_equal(DateTime.new(2013, 05, 20, 20, 29, 50), store.last_order_date(OrderStatus.received))
+    
+    store.reset_orders
+    process_orders.define_singleton_method(:max_date_to_process) { DateTime.new(2013, 5, 20, 20, 40, 00) }
+    process_orders.run
+    orders_hash = store.orders.index_by(&:id)
+    assert_not(orders_hash[101].sent?)
+    assert_not(orders_hash[102].sent?)
+    assert_not(orders_hash[103].sent?)
+    assert_not(orders_hash[104].sent?)
+    assert(orders_hash[105].sent?)
+    assert_equal(DateTime.new(2013, 05, 20, 20, 35, 00), store.last_order_date(OrderStatus.received))
+
+    store.reset_orders
+    process_orders.define_singleton_method(:max_date_to_process) { DateTime.new(2013, 5, 20, 20, 50, 00) }
+    process_orders.run
+    orders_hash = store.orders.index_by(&:id)
+    assert_not(orders_hash[101].sent?)
+    assert(orders_hash[102].sent?)
+    assert_not(orders_hash[103].sent?)
+    assert_not(orders_hash[104].sent?)
+    assert_not(orders_hash[105].sent?)
+    assert_equal(DateTime.new(2013, 05, 20, 20, 45, 00), store.last_order_date(OrderStatus.received))
+
+    store.reset_orders
+    process_orders.define_singleton_method(:max_date_to_process) { DateTime.new(2013, 5, 20, 21, 00, 00) }
+    process_orders.run
+    store.orders.each do |order|
+      assert_not(order.sent?)
+    end
+    assert_equal(DateTime.new(2013, 05, 20, 20, 45, 00), store.last_order_date(OrderStatus.received))
   end
 
 end

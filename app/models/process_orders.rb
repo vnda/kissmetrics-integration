@@ -18,7 +18,7 @@ class ProcessOrders
               since_order_id = order.id if since_order_id.nil? || order.id < since_order_id
             end
           end while orders.any?
-          store.set_last_order_date(order_status, new_last_order_date)
+          store.set_last_order_date(order_status, new_last_order_date) unless new_last_order_date.nil?
         rescue => e
           puts e
         end
