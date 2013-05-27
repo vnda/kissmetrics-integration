@@ -20,6 +20,7 @@ class ProcessOrders
           end while orders.any?
           store.set_last_order_date(order_status, new_last_order_date) unless new_last_order_date.nil?
         rescue => e
+          Raven.capture_exception(e)
           puts e
         end
       end

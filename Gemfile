@@ -25,3 +25,4 @@ gem 'jbuilder', '~> 1.0.1'
 # gem 'debugger'
 
 gem 'rest-client'
+gem 'sentry-raven', git: 'https://github.com/getsentry/raven-ruby.git'
