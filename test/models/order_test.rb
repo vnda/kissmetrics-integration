@@ -43,6 +43,7 @@ class OrderTest < ActiveSupport::TestCase
       'received_at' => '2013-02-25T17:15:22-03:00',
       'confirmed_at' => nil,
       'canceled_at' => '2013-02-25T17:28:56-03:00',
+      'updated_at' => '2013-02-25T17:28:56-03:00'
     }
     url = Order.new(store, OrderStatus.received, order_hash).km_record_event_url
     assert_match(/[&\?]order_total=58.9/, url)

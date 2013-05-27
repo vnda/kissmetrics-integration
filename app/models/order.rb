@@ -25,7 +25,7 @@ class Order < Struct.new(
     self.store = store
     self.status = status
     order_hash.each_pair do |key, value|
-      self[key] = value unless key == "status"
+      self[key] = value if members.include?(key.to_sym) && key != "status"
     end
   end
 
