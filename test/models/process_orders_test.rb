@@ -6,7 +6,7 @@ def OrderStatus.all
   [by_param('received')]
 end
 
-class OrderMock < Struct.new(:id, :status_date)
+class OrderMock < Struct.new(:id, :status_date, :updated_at)
   def km_event
     @sent = true
   end
@@ -22,8 +22,7 @@ class StoreMock
 
   def initialize(orders)
     @orders = orders
-    @orders.sort_by!{|order| order.id}
-    @orders.reverse!    
+    @orders.sort_by!{|order| order.updated_at}
   end
   
   def domain
@@ -40,8 +39,8 @@ class StoreMock
     end
   end
   
-  def get_orders(order_status, since_order_id)
-    orders.select { |order| since_order_id.nil? || order.id < since_order_id }.take(3)
+  def get_orders(order_status, min_updated_at)
+    orders.select { |order| min_updated_at.nil? || order.updated_at > min_updated_at }.take(3)
   end
   
   def set_last_order_date(order_status, new_last_order_date)
@@ -58,11 +57,21 @@ class ProcessOrdersTest < ActiveSupport::TestCase
   
   def setup
     @orders = [
-      OrderMock.new(101, DateTime.new(2013, 05, 19, 23, 59, 00)),
-      OrderMock.new(102, DateTime.new(2013, 05, 20, 20, 45, 00)),
-      OrderMock.new(103, DateTime.new(2013, 05, 20, 18, 30, 00)),
-      OrderMock.new(104, DateTime.new(2013, 05, 20, 20, 29, 50)),
-      OrderMock.new(105, DateTime.new(2013, 05, 20, 20, 35, 00)),
+      OrderMock.new(
+        101, DateTime.new(2013, 05, 19, 23, 59, 00), DateTime.new(2013, 05, 19, 23, 59, 00)
+      ),
+      OrderMock.new(
+        102, DateTime.new(2013, 05, 20, 20, 45, 00), DateTime.new(2013, 05, 20, 20, 45, 00)
+      ),
+      OrderMock.new(
+        103, DateTime.new(2013, 05, 20, 18, 30, 00), DateTime.new(2013, 05, 21, 10, 10, 00)
+      ),
+      OrderMock.new(
+        104, DateTime.new(2013, 05, 20, 20, 29, 50), DateTime.new(2013, 05, 21, 22, 10, 00)
+      ),
+      OrderMock.new(
+        105, DateTime.new(2013, 05, 20, 20, 35, 00), DateTime.new(2013, 05, 21, 22, 15, 00)
+      ),
     ]
   end
 
@@ -70,10 +79,10 @@ class ProcessOrdersTest < ActiveSupport::TestCase
     store = StoreMock.new(@orders)
     orders = store.get_orders(OrderStatus.received, nil)
     assert_equal(3, orders.size)
-    assert_equal([105, 104, 103], orders.map(&:id))
-    orders = store.get_orders(OrderStatus.received, 103)
+    assert_equal([101, 102, 103], orders.map(&:id))
+    orders = store.get_orders(OrderStatus.received, DateTime.new(2013, 05, 21, 10, 10, 00))
     assert_equal(2, orders.size)
-    assert_equal([102, 101], orders.map(&:id))
+    assert_equal([104, 105], orders.map(&:id))
   end
 
   test "run" do

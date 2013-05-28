@@ -6,18 +6,22 @@ class ProcessOrders
       OrderStatus.all.each do |order_status|
         begin
           last_order_date = store.last_order_date(order_status)
-          since_order_id = nil
+          min_updated_at = nil
           new_last_order_date = nil
           begin
-            orders = store.get_orders(order_status, since_order_id)
+            last_min_updated_at = min_updated_at
+            orders = store.get_orders(order_status, min_updated_at)
+            break if orders.empty?
             orders.each do |order|
               if send_km_event?(order, last_order_date)
                 order.km_event
                 new_last_order_date = order.status_date if new_last_order_date.nil? || new_last_order_date < order.status_date
               end
-              since_order_id = order.id if since_order_id.nil? || order.id < since_order_id
+              min_updated_at = order.updated_at if min_updated_at.nil? || order.updated_at > min_updated_at
             end
-          end while orders.any?
+            # Evita entrar em loop infinito caso min_updated_at não tenha mudado
+            raise 'Mesmo min_updated_at' if last_min_updated_at == min_updated_at
+          end while true
           store.set_last_order_date(order_status, new_last_order_date) unless new_last_order_date.nil?
         rescue => e
           Raven.capture_exception(e)

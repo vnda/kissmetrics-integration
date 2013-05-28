@@ -1,7 +1,7 @@
 class Store < ActiveRecord::Base
 
-  def orders_api_url(status, since_id)
-    "http://#{user}:#{pass}@#{domain}/api/orders?status=#{status.param}&since_id=#{since_id}"
+  def orders_api_url(status, min_updated_at)
+    "http://#{user}:#{pass}@#{domain}/api/orders?status=#{status.param}&min_updated_at=#{min_updated_at}"
   end
 
   def last_order_date(status)
@@ -13,8 +13,8 @@ class Store < ActiveRecord::Base
     save!
   end
 
-  def get_orders(status, since_order_id)
-    url = orders_api_url(status, since_order_id)
+  def get_orders(status, min_updated_at)
+    url = orders_api_url(status, min_updated_at)
     response = RestClient.get_with_retry(url)
     raise "Erro na chamada de #{url}.\nResponse code #{response.code}" unless response.code == 200
     JSON.parse(response).map { |order_hash| Order.new(self, status, order_hash) }
