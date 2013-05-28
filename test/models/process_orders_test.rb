@@ -39,7 +39,7 @@ class StoreMock
     end
   end
   
-  def get_orders(order_status, min_updated_at)
+  def get_orders(order_status, min_updated_at = nil)
     orders.select { |order| min_updated_at.nil? || order.updated_at > min_updated_at }.take(3)
   end
   

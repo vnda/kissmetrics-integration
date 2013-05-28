@@ -1,7 +1,9 @@
 class Store < ActiveRecord::Base
 
-  def orders_api_url(status, min_updated_at)
-    "http://#{user}:#{pass}@#{domain}/api/orders?status=#{status.param}&min_updated_at=#{min_updated_at}"
+  def orders_api_url(status, min_updated_at = nil)
+    url = "http://#{user}:#{pass}@#{domain}/api/orders?status=#{status.param}"
+    url << "&min_updated_at=#{min_updated_at}" if min_updated_at.present?
+    url
   end
 
   def last_order_date(status)
