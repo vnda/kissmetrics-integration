@@ -22,7 +22,9 @@ class OrderTest < ActiveSupport::TestCase
       'first_name' => 'Rafael',
       'last_name' => 'Souza',
       'email' => 'rafael.ssouza@gmail.com',
-      'client_id' => "3",
+      'city' => 'São Borja',
+      'state' => 'RS',
+      'client_id' => '3',
       'slip' => false,
       'slip_url' => nil,
       'payment_method' => 'Cartão de Crédito (Visa)',
@@ -47,12 +49,37 @@ class OrderTest < ActiveSupport::TestCase
     }
     url = Order.new(store, OrderStatus.received, order_hash).km_record_event_url
     assert_match(/[&\?]order_total=58.9/, url)
+    assert_match(/[&\?]City=S%C3%A3o%20Borja/, url)
+    assert_match(/[&\?]State=RS/, url)
     assert_match(/[&\?]Items%20Quantity=1/, url)
+    assert_match(/[&\?]State=RS/, url)
     assert_match(/[&\?]_p=3/, url)
     url = Order.new(store, OrderStatus.canceled, order_hash).km_record_event_url
     assert_match(/[&\?]canceled_total=58.9/, url)
     url = Order.new(store, OrderStatus.confirmed, order_hash).km_record_event_url
     assert_match(/[&\?]billing_amout=58.9/, url)
+  end
+
+  test "km_record_event_url with multiple items" do
+    store = stores(:bodystore)
+    order_hash = {
+      'total' => 130.0,
+      'items' => [
+        {
+          "quantity" => 2,
+          "subtotal" => 20.0,
+          "total" => 40.0
+        },
+        {
+          "quantity" => 3,
+          "subtotal" => 30.0,
+          "total" => 90.0
+        }
+      ],
+      'received_at' => '2013-02-25T17:15:22-03:00',
+    }
+    url = Order.new(store, OrderStatus.received, order_hash).km_record_event_url
+    assert_match(/[&\?]Items%20Quantity=5/, url)
   end
 
   test "km_set_item_properites_url" do
@@ -63,7 +90,7 @@ class OrderTest < ActiveSupport::TestCase
       'first_name' => 'Rafael',
       'last_name' => 'Souza',
       'email' => 'rafael.ssouza@gmail.com',
-      'client_id' => "3",
+      'client_id' => '3',
       'slip' => false,
       'slip_url' => nil,
       'payment_method' => 'Cartão de Crédito (Visa)',
