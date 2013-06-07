@@ -53,7 +53,7 @@ class OrderTest < ActiveSupport::TestCase
     assert_match(/[&\?]State=RS/, url)
     assert_match(/[&\?]Items%20Quantity=1/, url)
     assert_match(/[&\?]State=RS/, url)
-    assert_match(/[&\?]_p=3/, url)
+    assert_match(/[&\?]_p=rafael.ssouza%40gmail.com/, url)
     url = Order.new(store, OrderStatus.canceled, order_hash).km_record_event_url
     assert_match(/[&\?]canceled_total=58.9/, url)
     url = Order.new(store, OrderStatus.confirmed, order_hash).km_record_event_url

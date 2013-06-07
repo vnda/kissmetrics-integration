@@ -44,7 +44,7 @@ class Order < Struct.new(
   def km_api_key_person_parameters
     {
       '_k' => store.km_api_key,
-      '_p' => client_id,
+      '_p' => email,
     }    
   end
   
@@ -78,7 +78,7 @@ class Order < Struct.new(
   end
   
   def km_alias_user_url
-    params = km_api_key_person_parameters.merge({'_n' => email})
+    params = km_api_key_person_parameters.merge({'_n' => client_id})
     "http://trk.kissmetrics.com/a?#{params.to_query}"    
   end
 
@@ -99,7 +99,8 @@ class Order < Struct.new(
   end
 
   def km_event
-    RestClient.get_with_retry(km_alias_user_url)
+    raise "Identificador da pessoa (email) não pode ser vazio" if email.blank?
+    RestClient.get_with_retry(km_alias_user_url) if client_id.present?
     RestClient.get_with_retry(km_record_event_url)
     puts "Order #{id} #{status.param} at #{status_date}."
     items.each_index do |i|
