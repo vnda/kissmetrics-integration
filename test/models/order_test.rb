@@ -107,6 +107,14 @@ class OrderTest < ActiveSupport::TestCase
           "quantity" => 1,
           "subtotal" => 55.9,
           "total" => 55.9
+        },
+        {
+          "id" => 26662,
+          "reference" => "2662",
+          "sku" => "2662",
+          "quantity" => 2,
+          "subtotal" => 22.0,
+          "total" => 44.0
         }
       ],
       'received_at' => '2013-02-25T17:15:22-03:00',
@@ -115,13 +123,17 @@ class OrderTest < ActiveSupport::TestCase
     }
     order = Order.new(store, OrderStatus.received, order_hash)
     url = order.km_set_item_properites_url(1, order.items.first)
-    assert_match(/[&\?]Received%20Item%5B1%5D%5BSKU%5D=1816/, url)
+    assert_match(/_t=1361823323/, url)
+    assert_match(/[&\?]Received%20Item%5BSKU%5D=1816/, url)
+    url = order.km_set_item_properites_url(2, order.items.last)
+    assert_match(/_t=1361823324/, url)
+    assert_match(/[&\?]Received%20Item%5BSKU%5D=2662/, url)
     order = Order.new(store, OrderStatus.canceled, order_hash)
     url = order.km_set_item_properites_url(1, order.items.first)
-    assert_match(/[&\?]Canceled%20Item%5B1%5D%5BSKU%5D=1816/, url)
+    assert_match(/[&\?]Canceled%20Item%5BSKU%5D=1816/, url)
     order = Order.new(store, OrderStatus.confirmed, order_hash)
     url = order.km_set_item_properites_url(1, order.items.first)
-    assert_match(/[&\?]Confirmed%20Item%5B1%5D%5BSKU%5D=1816/, url)
+    assert_match(/[&\?]Confirmed%20Item%5BSKU%5D=1816/, url)
   end
 
 end

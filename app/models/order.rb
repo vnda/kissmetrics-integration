@@ -49,9 +49,9 @@ class Order < Struct.new(
   end
   
   
-  def km_api_main_parameters
+  def km_api_main_parameters(timestrap_increment = 0)
     km_api_key_person_parameters.merge({
-      '_t' => status_timestamp,
+      '_t' => status_timestamp + timestrap_increment,
       '_d' => '1',
     })
   end
@@ -84,15 +84,13 @@ class Order < Struct.new(
 
   # http://support.kissmetrics.com/apis/specifications.html#setting-properties
   def km_set_item_properites_url(index, item)
-    params = km_api_main_parameters.merge({
+    params = km_api_main_parameters(index).merge({
       "#{status.km_item_prefix} Item" => {
-        index => {
-          'SKU' => item['sku'],
-          'Reference' => item['reference'],
-          'Quantity' => item['quantity'],
-          'Price' => item['subtotal'],
-          'Total Price' => item['total']
-        }
+        'SKU' => item['sku'],
+        'Reference' => item['reference'],
+        'Quantity' => item['quantity'],
+        'Price' => item['subtotal'],
+        'Total Price' => item['total'],
       },
     })
     "http://trk.kissmetrics.com/s?#{params.to_query}"
