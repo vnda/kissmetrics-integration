@@ -51,13 +51,14 @@ class OrderTest < ActiveSupport::TestCase
     assert_match(/[&\?]order_total=58.9/, url)
     assert_match(/[&\?]City=S%C3%A3o%20Borja/, url)
     assert_match(/[&\?]State=RS/, url)
-    assert_match(/[&\?]Items%20Quantity=1/, url)
-    assert_match(/[&\?]State=RS/, url)
+    assert_match(/[&\?]Received%20Items%20Quantity=1/, url)
     assert_match(/[&\?]_p=rafael.ssouza%40gmail.com/, url)
     url = Order.new(store, OrderStatus.canceled, order_hash).km_record_event_url
     assert_match(/[&\?]canceled_total=58.9/, url)
+    assert_match(/[&\?]Canceled%20Items%20Quantity=1/, url)
     url = Order.new(store, OrderStatus.confirmed, order_hash).km_record_event_url
     assert_match(/[&\?]billing_amout=58.9/, url)
+    assert_match(/[&\?]Confirmed%20Items%20Quantity=1/, url)
   end
 
   test "km_record_event_url with multiple items" do
@@ -79,7 +80,7 @@ class OrderTest < ActiveSupport::TestCase
       'received_at' => '2013-02-25T17:15:22-03:00',
     }
     url = Order.new(store, OrderStatus.received, order_hash).km_record_event_url
-    assert_match(/[&\?]Items%20Quantity=5/, url)
+    assert_match(/[&\?]Received%20Items%20Quantity=5/, url)
   end
 
   test "km_set_item_properites_url" do

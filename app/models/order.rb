@@ -64,7 +64,7 @@ class Order < Struct.new(
       'Order Code' => code,
       'City' => city,
       'State' => state,
-      'Items Quantity' => items.inject(0) { |sum, item| sum + item['quantity'] },
+      "#{status.km_item_prefix} Items Quantity" => items.inject(0) { |sum, item| sum + item['quantity'] },
       'Name' => "#{first_name} #{last_name}",
       'ClientId' => client_id,
       'Email' => email,
